@@ -1,7 +1,7 @@
 #ifndef	IMAGE_IO_TGA_H
 #define	IMAGE_IO_TGA_H
 
-#include "RasterImage.h"
+#include "utilities.h"
 
 /*	No-frills function that reads an image file in the <b>uncompressed</b>, un-commented TARGA 
  *	file format. If the image cannot be read (file not found, invalid format, etc.)

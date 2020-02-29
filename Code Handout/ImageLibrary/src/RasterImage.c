@@ -8,9 +8,6 @@
 #define BYTES_GRAY 1
 #define WORDSIZE 16
 
-void readImage(char* path, unsigned short* width, unsigned short* height, ImageType imgType);
-void writeImage(char* path);
-
 RasterImage newImage(unsigned short width, unsigned short height, ImageType type,
 					 unsigned char wordSizeRowPadding)
 {
@@ -38,29 +35,56 @@ RasterImage newImage(unsigned short width, unsigned short height, ImageType type
     }
     img.bytesPerRow = (img.bytesPerPixel * width);
 
-    img.raster = (void*)calloc((width * height), img.bytesPerPixel);
-    
+    img.raster = calloc((width * height), img.bytesPerPixel);
+    img.raster2D = raster2D((char*)img.raster, img.height, img.width);
+    (void)wordSizeRowPadding;
 
     return img;
 }
 
-void readImage(char* path, unsigned short* width, unsigned short* height, ImageType imgType){
-    char * extension = strrchr(path, '.');
+RasterImage readImage(char* path){
+    unsigned short width, height;
+	ImageType imgType;
+    char * extension = malloc(sizeof(char*));
+    extension = strrchr(path, '.');
     unsigned char* buffer;
-    if(extension == ".tga"){
+    if(strcmp(extension, ".tga") == 0){
         FILE * tgaFile = fopen(path, "rb");
         if(tgaFile){
-            buffer = readTGA(path, width, height, &imgType);
-            RasterImage tgaImage = newImage(*width, *height, imgType, WORDSIZE);
+            buffer = readTGA(path, &width, &height, &imgType);
+            RasterImage tgaImage = newImage(width, height, imgType, WORDSIZE);
+            tgaImage.raster = buffer;
+            return tgaImage;
         }
+        else{
+            printf("File not found.");
+            exit(1);
+        }
+    }
+    else{
+        printf("Invalid file extension.");
+        exit(1);
     }
 }
 
-void writeImage(char* path){
+int writeImage(char* path, RasterImage * img){
 
+    // We can assume already that our image is a valid TGA because it's verified at readImage.
+    writeTGA(path, img->raster, img->width, img->height, img->type);
+    return 0;
 }
 
 void freeImage(RasterImage* img){
-
+    free(img->raster);
+    free(img->raster2D);
+    free(img);
 }
 
+char** raster2D(char* s, unsigned int numRows, unsigned int numCols){
+	char** raster2D = (char**)calloc((numRows), sizeof(char*));
+	raster2D[0] = s;
+	for(unsigned int i = 1; i < numRows; i++){
+		raster2D[i] = raster2D[i-1] + numCols;
+	}
+	return raster2D;
+}

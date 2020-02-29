@@ -109,6 +109,24 @@ RasterImage newImage(unsigned short width, unsigned short height, ImageType type
  */
 void freeImage(RasterImage* img);
 
+/**	returns a new RasterImage object after reading a raster from the readTGA file.
+ *	@param path	path to the original .tga image to read in to the program. 
+ */
+RasterImage readImage(char* path);
+
+/**	writes the new, modified image to the file. 
+ *	@param filePath	path to the new output directory & image to write.
+ *  @param img 		the original RasterImage object that operations will be performed on
+ */
+int writeImage(char* filePath, RasterImage * img);
+
+/**	returns a new 2D raster 
+ *	@param s	    the original raster
+ *  @param numRows 	the amount of rows in the raster
+ *  @param numCols  the amount of columns in the raster
+ */
+char** raster2D(char* s, unsigned int numRows, unsigned int numCols);
+
 
 
 #endif	//	RASTER_IMAGE_H
